@@ -1,8 +1,9 @@
-import base64, smtplib, urllib.parse
+import base64, re, smtplib, urllib.parse
 from datetime import datetime
 from email.message import EmailMessage
 from pathlib import Path
 import streamlit as st
+import streamlit.components.v1 as components
 
 STORE = "Tangudu Viswanadham Grocery Store"
 PHONE, WA = "9676013866", "919676013866"
@@ -21,7 +22,7 @@ CATALOG = {
 }
 UNITS = ["kg", "g", "litre", "packet", "bag (25 kg)", "bag (50 kg)", "piece", "dozen"]
 
-st.set_page_config(page_title=f"{STORE}", page_icon="🛒", layout="wide")
+st.set_page_config(page_title=STORE, page_icon="🛒", layout="wide")
 
 def b64(name):
     p = ASSETS / name
@@ -29,24 +30,47 @@ def b64(name):
 
 st.markdown(f"""
 <style>
-#MainMenu, footer, header [data-testid="stToolbar"] {{visibility:hidden}}
+/* Force a light, high-contrast look on every device (also when the phone/browser is in dark mode) */
+:root {{color-scheme: light}}
+#MainMenu, footer {{visibility:hidden}}
+.stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {{background:#FFFFFF !important}}
+.stApp, .stApp p, .stApp li, .stApp label, .stApp h1, .stApp h2, .stApp h3, .stApp h4,
+[data-testid="stMarkdownContainer"] *, [data-testid="stWidgetLabel"] *, [data-testid="stCaptionContainer"] * {{color:#12332B}}
 .block-container {{max-width:1100px; padding-top:1rem}}
 html {{scroll-behavior:smooth}}
-.hero {{background:linear-gradient(105deg,rgba(10,45,37,.94) 35%,rgba(10,45,37,.55)),url(data:image/png;base64,{b64('hero.png')}) center/cover;
-  border-radius:18px; padding:64px 44px; color:#fff; margin-bottom:22px}}
-.hero h1 {{font-size:clamp(2rem,5vw,3.4rem); line-height:1.1; margin:0 0 14px; color:#fff; font-weight:800}}
-.hero .tag {{font-size:1.3rem; margin:0}} .hero .tel {{font-size:1.15rem; margin:6px 0 24px; color:#F2D675}}
-.btn {{display:inline-block; padding:12px 24px; border-radius:8px; font-weight:600; text-decoration:none!important; margin:0 10px 8px 0}}
-.btn.p {{background:#F2B705; color:#12332B!important}} .btn.s {{border:2px solid #fff; color:#fff!important}}
+.stApp input, .stApp textarea {{background:#FFFFFF !important; color:#12332B !important; -webkit-text-fill-color:#12332B !important; border:1.5px solid #8FA39B !important; border-radius:8px}}
+.stApp input::placeholder, .stApp textarea::placeholder {{color:#6B7F78 !important; -webkit-text-fill-color:#6B7F78 !important}}
+[data-baseweb="select"] > div {{background:#FFFFFF !important; border:1.5px solid #8FA39B !important}}
+[data-baseweb="select"] *, [data-baseweb="popover"] * {{color:#12332B !important; background-color:#FFFFFF}}
+[data-testid="stExpander"] {{border:1.5px solid #CFDAD2; border-radius:10px; background:#F7FAF6}}
+[data-testid="stExpander"] summary * {{color:#12332B !important; font-weight:600}}
+[data-testid="stFileUploaderDropzone"] {{background:#FFFFFF !important; border:2px dashed #12332B !important}}
+[data-testid="stFileUploaderDropzone"] * {{color:#12332B !important}}
+[data-testid="stFileUploaderDropzone"] button {{background:#FFFFFF !important; border:1.5px solid #12332B !important}}
+.stApp [data-testid="stBaseButton-primary"] {{background:#C8321E !important; border:0 !important}}
+.stApp [data-testid="stBaseButton-primary"] * {{color:#FFFFFF !important; font-weight:600}}
+.stApp [data-testid="stBaseButton-secondary"] {{background:#FFFFFF !important; border:1.5px solid #12332B !important}}
+.stApp [data-testid="stBaseButton-secondary"] * {{color:#12332B !important}}
+.stApp a[data-testid^="stBaseLinkButton"] {{background:#128C4A !important; border:0 !important}}
+.stApp a[data-testid^="stBaseLinkButton"] * {{color:#FFFFFF !important; font-weight:700}}
+.st-key-typebox, .st-key-photobox {{border:2px solid #F2B705; background:#FFFBEA; border-radius:14px; padding:18px}}
+.hero {{background:linear-gradient(105deg,rgba(10,45,37,.95) 35%,rgba(10,45,37,.55)),url(data:image/png;base64,{b64('hero.png')}) center/cover;
+  border-radius:18px; padding:64px 44px; margin-bottom:22px}}
+.stApp .hero h1 {{font-size:clamp(2rem,5vw,3.4rem); line-height:1.1; margin:0 0 14px; font-weight:800; color:#FFFFFF}}
+.stApp .hero .tag {{font-size:1.3rem; margin:0; color:#FFFFFF}}
+.stApp .hero .tel {{font-size:1.15rem; margin:6px 0 24px; color:#F2D675}}
+.btn {{display:inline-block; padding:12px 24px; border-radius:8px; font-weight:600; text-decoration:none !important; margin:0 10px 8px 0}}
+.stApp .btn.p {{background:#F2B705; color:#12332B}} .stApp .btn.s {{border:2px solid #fff; color:#FFFFFF}}
 .info {{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-bottom:34px}}
-.card {{background:#F3F6F1; border-radius:12px; padding:18px 20px; border:1px solid #DCE5DD}}
-.card b {{display:block; margin-bottom:4px; color:#C8321E}} .card a {{color:#12332B}}
-h2.sec {{margin:36px 0 6px; font-size:1.9rem; color:#12332B}}
-.sub {{color:#4F6B64; margin-bottom:18px}}
+.card {{background:#F3F6F1; border-radius:12px; padding:18px 20px; border:1px solid #CFDAD2}}
+.stApp .card b {{display:block; margin-bottom:4px; color:#B02A18}}
+.stApp .card a {{color:#12332B; text-decoration:underline}}
+.stApp h2.sec {{margin:36px 0 6px; font-size:1.9rem}}
+.sub {{margin-bottom:18px}} .stApp .sub {{color:#3E5A52}}
 .cats {{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px}}
-.cat {{border:1px solid #DCE5DD; border-left:5px solid #F2B705; border-radius:10px; padding:14px 16px; background:#fff}}
-.cat small {{color:#4F6B64}}
-.foot {{margin-top:46px; padding:22px 0; border-top:1px solid #DCE5DD; color:#4F6B64; text-align:center}}
+.cat {{border:1px solid #CFDAD2; border-left:5px solid #F2B705; border-radius:10px; padding:14px 16px; background:#FFFFFF}}
+.stApp .cat small {{color:#3E5A52}}
+.stApp .foot {{margin-top:46px; padding:22px 0; border-top:1px solid #CFDAD2; text-align:center; color:#3E5A52}}
 @media (max-width:640px) {{.hero {{padding:40px 22px}}}}
 </style>
 
@@ -54,7 +78,7 @@ h2.sec {{margin:36px 0 6px; font-size:1.9rem; color:#12332B}}
   <h1>{STORE}</h1>
   <p class="tag">Grocery and kirana items at wholesale prices</p>
   <p class="tel">కిరాణా సరుకులు హోల్‌సేల్ ధరలకే</p>
-  <a class="btn p" href="#order">Build your order</a>
+  <a class="btn p" href="#order">Place your order</a>
   <a class="btn s" href="tel:+91{PHONE}">Call {PHONE}</a>
 </div>
 
@@ -82,10 +106,9 @@ if (ASSETS / "produce.png").exists():
     st.image(str(ASSETS / "produce.png"), use_container_width=True)
 
 # ---------------- ORDER ----------------
-st.markdown('<div id="order"></div><h2 class="sec">Build your order</h2>'
-            '<div class="sub">Add items one by one, or send a photo of your handwritten list. We will call you to confirm the price.</div>',
-            unsafe_allow_html=True)
-
+st.markdown('<div id="order"></div><h2 class="sec">Place your order</h2>'
+            '<div class="sub">Type your list or send a photo of it. Then add your details and press the button. '
+            'We will call you to confirm the price.</div>', unsafe_allow_html=True)
 st.session_state.setdefault("items", [])
 
 def send_email(subject, body, image=None):
@@ -103,69 +126,75 @@ def send_email(subject, body, image=None):
         s.send_message(msg)
     return True
 
-tab_build, tab_photo = st.tabs(["Type your list", "Send a photo of your list"])
+left, right = st.columns(2)
+with left:
+    with st.container(key="typebox"):
+        st.markdown("### ✍️ Type your list")
+        typed = st.text_area("Write your items and quantities",
+                             placeholder="Example:\nRice 25 kg\nToor dal 5 kg\nSunflower oil 5 litre",
+                             height=200)
+with right:
+    with st.container(key="photobox"):
+        st.markdown("### 📷 Send a photo of your list")
+        photo = st.file_uploader("Upload a clear photo", type=["png", "jpg", "jpeg", "webp"])
+        if photo:
+            st.image(photo, width=220)
 
-with tab_build:
+with st.expander("Or pick items from our list (optional)"):
     c1, c2, c3, c4 = st.columns([2, 2, 1, 1.4])
     cat = c1.selectbox("Category", list(CATALOG) + ["Other (type below)"])
-    if cat.startswith("Other"):
-        item = c2.text_input("Item name")
-    else:
-        item = c2.selectbox("Item", CATALOG[cat])
+    item = c2.text_input("Item name") if cat.startswith("Other") else c2.selectbox("Item", CATALOG[cat])
     qty = c3.number_input("Quantity", min_value=1, value=1, step=1)
     unit = c4.selectbox("Unit", UNITS)
-    if st.button("Add to list", type="primary"):
+    if st.button("Add to list"):
         if item.strip():
             st.session_state["items"].append((item.strip(), int(qty), unit))
         else:
             st.warning("Type the item name first.")
-    if st.session_state["items"]:
-        st.markdown("**Your list**")
-        for i, (n, q, u) in enumerate(st.session_state["items"]):
-            a, b = st.columns([6, 1])
-            a.write(f"{i+1}. {n} – {q} {u}")
-            if b.button("Remove", key=f"rm{i}"):
-                st.session_state["items"].pop(i)
-                st.rerun()
-    else:
-        st.info("Your list is empty. Add your first item above.")
-
-with tab_photo:
-    photo = st.file_uploader("Upload a clear photo of your list", type=["png", "jpg", "jpeg", "webp"])
-    if photo:
-        st.image(photo, width=320)
-    note = st.text_area("Anything else we should know? (optional)", height=80)
+    for i, (n, q, u) in enumerate(st.session_state["items"]):
+        a, b = st.columns([6, 1])
+        a.write(f"{i+1}. {n} – {q} {u}")
+        if b.button("Remove", key=f"rm{i}"):
+            st.session_state["items"].pop(i)
+            st.rerun()
 
 st.markdown("### Your contact and delivery details")
 d1, d2 = st.columns(2)
 name = d1.text_input("Your name")
-phone = d2.text_input("Mobile number", max_chars=15)
-address = st.text_area("Delivery address / pickup note", height=90)
+phone = d2.text_input("Mobile number", placeholder="10-digit mobile number")
+address = st.text_area("Delivery address or pickup note", height=90)
 
-if st.button("Place order", type="primary", use_container_width=True):
-    items, ok = st.session_state["items"], True
-    if not name.strip() or len(phone.strip()) < 10 or not address.strip():
-        st.error("Please fill your name, a 10-digit mobile number and your address.")
-        ok = False
-    elif not items and not photo:
-        st.error("Add at least one item, or upload a photo of your list.")
-        ok = False
-    if ok:
-        lines = "\n".join(f"- {n}: {q} {u}" for n, q, u in items) or "(see attached photo)"
-        extra = f"\nNote: {note.strip()}" if note.strip() else ""
-        body = (f"New order - {datetime.now():%d %b %Y, %I:%M %p}\n\nName: {name}\nPhone: {phone}\n"
-                f"Address: {address}\n\nItems:\n{lines}{extra}")
-        sent = False
+if st.button("Place Order via WhatsApp", type="primary", use_container_width=True):
+    digits = re.sub(r"\D", "", phone)
+    if len(digits) == 12 and digits.startswith("91"):
+        digits = digits[2:]
+    items = st.session_state["items"]
+    if not name.strip() or not address.strip():
+        st.error("Please enter your name and address.")
+    elif len(digits) != 10:
+        st.error("Please enter a 10-digit mobile number.")
+    elif not (typed.strip() or photo or items):
+        st.error("Please type your list, upload a photo of it, or pick at least one item.")
+    else:
+        parts = []
+        if typed.strip():
+            parts.append("Typed list:\n" + typed.strip())
+        if items:
+            parts.append("Picked items:\n" + "\n".join(f"- {n}: {q} {u}" for n, q, u in items))
+        if photo:
+            parts.append("Photo of list: attached (I am sending it in this chat).")
+        body = (f"New order - {datetime.now():%d %b %Y, %I:%M %p}\n\nName: {name.strip()}\n"
+                f"Phone: {digits}\nAddress: {address.strip()}\n\n" + "\n\n".join(parts))
         try:
-            sent = send_email(f"New order from {name} ({phone})", body, photo)
+            send_email(f"New order from {name.strip()} ({digits})", body, photo)
         except Exception:
-            sent = False
-        if sent:
-            st.success("Order sent. We will call you shortly to confirm.")
-            st.session_state["items"] = []
-        else:
-            st.warning("We could not send this automatically. Please tap the button below to send it on WhatsApp.")
-        wa_text = urllib.parse.quote(body + ("\n\n(Photo of list: I will attach it in this chat.)" if photo else ""))
-        st.link_button("Send on WhatsApp", f"https://wa.me/{WA}?text={wa_text}")
+            pass
+        url = f"https://wa.me/{WA}?text=" + urllib.parse.quote(body)
+        st.success("Your order is ready. Tap the green button to send it on WhatsApp.")
+        if photo:
+            st.info("After WhatsApp opens, tap the attach icon and add your photo of the list.")
+        st.link_button("Open WhatsApp and send order", url, use_container_width=True)
+        components.html(f"<script>window.open('{url}','_blank');</script>", height=0)
+        st.session_state["items"] = []
 
 st.markdown(f'<div class="foot">© {datetime.now().year} {STORE}<br>{ADDRESS}</div>', unsafe_allow_html=True)
