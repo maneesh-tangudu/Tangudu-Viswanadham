@@ -68,6 +68,9 @@ html {{scroll-behavior:smooth}}
 .stApp .hero h1 {{font-size:clamp(2rem,5vw,3.4rem); line-height:1.1; margin:0 0 14px; font-weight:800; color:#FFFFFF !important}}
 .stApp .hero .tag {{font-size:1.3rem; margin:0; color:#FFFFFF !important}}
 .stApp .hero .tel {{font-size:1.15rem; margin:6px 0 24px; color:#F2D675 !important}}
+html body .stApp [data-testid="stMarkdownContainer"] .hero h1, html body .stApp .hero h1 {{color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important; text-shadow:0 2px 10px rgba(0,0,0,.55)}}
+html body .stApp [data-testid="stMarkdownContainer"] .hero .tag {{color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important}}
+html body .stApp [data-testid="stMarkdownContainer"] .hero .tel {{color:#FFE08A !important; -webkit-text-fill-color:#FFE08A !important}}
 .btn {{display:inline-block; padding:12px 24px; border-radius:8px; font-weight:600; text-decoration:none !important; margin:0 10px 8px 0}}
 .stApp .btn.p {{background:#F2B705; color:#12332B !important}} .stApp .btn.s {{border:2px solid #fff; color:#FFFFFF !important}}
 .info {{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-bottom:34px}}
