@@ -35,7 +35,7 @@ st.markdown(f"""
 #MainMenu, footer {{visibility:hidden}}
 .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {{background:#FFFFFF !important}}
 .stApp, .stApp p, .stApp li, .stApp label, .stApp h1, .stApp h2, .stApp h3, .stApp h4,
-[data-testid="stMarkdownContainer"] *, [data-testid="stWidgetLabel"] *, [data-testid="stCaptionContainer"] * {{color:#12332B}}
+[data-testid="stMarkdownContainer"] *, [data-testid="stWidgetLabel"] *, [data-testid="stCaptionContainer"] * {{color:#12332B !important}}
 .block-container {{max-width:1100px; padding-top:1rem}}
 html {{scroll-behavior:smooth}}
 .stApp input, .stApp textarea {{background:#FFFFFF !important; color:#12332B !important; -webkit-text-fill-color:#12332B !important; border:1.5px solid #8FA39B !important; border-radius:8px}}
@@ -53,17 +53,26 @@ html {{scroll-behavior:smooth}}
 .stApp [data-testid="stBaseButton-secondary"] * {{color:#12332B !important}}
 .stApp a[data-testid^="stBaseLinkButton"] {{background:#128C4A !important; border:0 !important}}
 .stApp a[data-testid^="stBaseLinkButton"] * {{color:#FFFFFF !important; font-weight:700}}
+/* Extra fixes: boxes, alerts, number box and expander that Streamlit paints dark in dark mode */
+[data-baseweb="input"], [data-baseweb="base-input"], [data-baseweb="textarea"] {{background:#FFFFFF !important}}
+[data-testid="stNumberInput"] button {{background:#FFFFFF !important; color:#12332B !important}}
+[data-testid="stExpander"] details, [data-testid="stExpander"] summary {{background:#F7FAF6 !important}}
+[data-testid="stAlert"], [data-testid="stAlertContainer"] {{background:#E6F2E9 !important; border:1.5px solid #7FA58B !important; border-radius:10px}}
+[data-testid="stAlert"] *, [data-testid="stAlertContainer"] * {{color:#0B2A22 !important}}
+[data-testid="stFileUploaderDropzone"] small, [data-testid="stFileUploaderFile"] * {{color:#12332B !important}}
+.stApp hr {{border-color:#CFDAD2}}
 .st-key-typebox, .st-key-photobox {{border:2px solid #F2B705; background:#FFFBEA; border-radius:14px; padding:18px}}
+.st-key-typebox *, .st-key-photobox * {{color:#12332B !important}}
 .hero {{background:linear-gradient(105deg,rgba(10,45,37,.95) 35%,rgba(10,45,37,.55)),url(data:image/png;base64,{b64('hero.png')}) center/cover;
   border-radius:18px; padding:64px 44px; margin-bottom:22px}}
-.stApp .hero h1 {{font-size:clamp(2rem,5vw,3.4rem); line-height:1.1; margin:0 0 14px; font-weight:800; color:#FFFFFF}}
-.stApp .hero .tag {{font-size:1.3rem; margin:0; color:#FFFFFF}}
-.stApp .hero .tel {{font-size:1.15rem; margin:6px 0 24px; color:#F2D675}}
+.stApp .hero h1 {{font-size:clamp(2rem,5vw,3.4rem); line-height:1.1; margin:0 0 14px; font-weight:800; color:#FFFFFF !important}}
+.stApp .hero .tag {{font-size:1.3rem; margin:0; color:#FFFFFF !important}}
+.stApp .hero .tel {{font-size:1.15rem; margin:6px 0 24px; color:#F2D675 !important}}
 .btn {{display:inline-block; padding:12px 24px; border-radius:8px; font-weight:600; text-decoration:none !important; margin:0 10px 8px 0}}
-.stApp .btn.p {{background:#F2B705; color:#12332B}} .stApp .btn.s {{border:2px solid #fff; color:#FFFFFF}}
+.stApp .btn.p {{background:#F2B705; color:#12332B !important}} .stApp .btn.s {{border:2px solid #fff; color:#FFFFFF !important}}
 .info {{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-bottom:34px}}
 .card {{background:#F3F6F1; border-radius:12px; padding:18px 20px; border:1px solid #CFDAD2}}
-.stApp .card b {{display:block; margin-bottom:4px; color:#B02A18}}
+.stApp .card b {{display:block; margin-bottom:4px; color:#B02A18 !important}}
 .stApp .card a {{color:#12332B; text-decoration:underline}}
 .stApp h2.sec {{margin:36px 0 6px; font-size:1.9rem}}
 .sub {{margin-bottom:18px}} .stApp .sub {{color:#3E5A52}}
